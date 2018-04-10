@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>3D轮播翻转</title>
+	<style>
+		* {margin: 0;padding: 0;}
+		ul {list-style: none;}
+		#box {position: relative;width: 800px;height: 300px;margin: 100px auto;-webkit-perspective: 800px;-moz-perspective: 800px;}
+		#box ul {width: 800px;height: 300px;}
+		#box ul li {float: left;position: relative;height: 300px;transform-origin: center center -150px;transform-style: preserve-3d;}
+		#box ul li span {position: absolute;width: 100%;height: 100%;}
+		#box ul li span:nth-child(1) {top: -100%;height: 100%;background: red;transform-origin: bottom;transform: rotateX(90deg);}
+		#box ul li span:nth-child(2) {top: 100%;height: 100%;background: green;transform-origin: top;transform: rotateX(-90deg);}
+		#box ul li span:nth-child(3) {background: pink;}
+		#box ul li span:nth-child(4) {background: #f60;transform: translateZ(-300px) rotateX(180deg);}
+		#box div {display: flex;position: absolute;right: 25px;bottom: 25px;width: 90px;z-index: 100;justify-content: space-between;}
+		#box div span {width: 20px;height: 20px;color: #fff;cursor: pointer;text-align: center;line-height: 20px;background: #000;border-radius: 50%;}
+		#box div span.active {background: red;}
+	</style>
+</head>
+<body>
+	<div id="box">
+		<ul>
+			<!-- <li>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+			</li>
+			<li>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+			</li>
+			<li>
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+			</li>
+			<li style="z-index: -1">
+				<span></span>
+				<span></span>
+				<span></span>
+				<span></span>
+			</li> -->
+		</ul>
+		<div class="tab">
+			<span class="active">1</span>
+			<span>2</span>
+			<span>3</span>
+			<span>4</span>
+		</div>
+	</div>
+	<script>
+		const oBox = document.getElementById('box');
+		const oUl = document.getElementsByTagName('ul')[0];
+		const aLi = oUl.getElementsByTagName('li');
+		const oDiv = document.getElementsByClassName('tab')[0];
+		const aSpan = oDiv.getElementsByTagName('span');
+		const len = aSpan.length;
+		let n = 0;		
+		createLi(100);
+		
+		let timer = setInterval(auto, 2500);
+		oBox.addEventListener('mouseenter', () => {
+			clearInterval(timer);
+		});
+		oBox.addEventListener('mouseleave', () => {
+			timer = setInterval(auto, 2500);
+		});
+		oBox.addEventListener('selectstart', (ev) => {ev.preventDefault();return false;})
+		Array.prototype.forEach.call(aSpan, (item, index) => {
+			item.addEventListener('click', () => {
+				if (item !== aSpan[n]) {
+					aSpan[n].classList.remove('active');
+					n = index;
+					[].forEach.call(aLi, (item) => {
+						item.style.transform = 'rotateX(' + n * 90 + 'deg)';
+					});
+					item.classList.add('active');
+				}
+			});
+		});
+		function createLi(num) {
+			let oFrag = document.createDocumentFragment();
+			for (let i = 0; i < num; i++) {
+				let li = document.createElement('li');
+				li.style.width = 800 / num + 'px';
+				li.style.transition = '1s ' + i * 0.003 + 's';
+				if (i > num / 2 - 1) {
+					li.style.zIndex = -i;
+				}
+				for (let j = 0; j < 4; j++) {
+					let span = document.createElement('span');
+					span.style.background = 'url(images/' + (j + 1) + '.jpg) ' + (-i * 800 / num) + 'px 0/800px 300px no-repeat';
+					li.appendChild(span);
+				}
+				oFrag.appendChild(li);
+				oUl.appendChild(oFrag);
+			}
+		}
+		function auto() {
+			aSpan[n].classList.remove('active');
+			n++;
+			if (n === len) {
+				n = 0;
+			}
+			[].forEach.call(aLi, (item) => {
+				item.style.transform = 'rotateX(' + n * 90 + 'deg)';
+			});
+			aSpan[n].classList.add('active');
+		}
+	</script>
+</body>
+</html>
